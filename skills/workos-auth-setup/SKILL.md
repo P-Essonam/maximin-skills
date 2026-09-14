@@ -44,6 +44,22 @@ npx convex env set WORKOS_API_KEY $YOUR_API_KEY_HERE
 
 Replace both placeholders with the values from the WorkOS dashboard. Confirm that both variable names are configured without printing their values.
 
+Update the existing `packages/backend/convex/convex.config.ts` to declare both required variables:
+
+```ts
+import { defineApp } from "convex/server"
+import { v } from "convex/values"
+
+const app = defineApp({
+  env: {
+    WORKOS_CLIENT_ID: v.string(),
+    WORKOS_API_KEY: v.string(),
+  },
+})
+
+export default app
+```
+
 ## Configure Convex token validation
 
 Create `packages/backend/convex/auth.config.ts`. This server-side configuration uses the WorkOS Client ID to validate access tokens:
@@ -417,6 +433,7 @@ Use it on protected TanStack server functions with `.middleware([authMiddleware]
 Regenerate the TanStack route tree, then confirm that:
 
 - AuthKit and CSRF request middleware are active;
+- Convex validates `WORKOS_CLIENT_ID` and `WORKOS_API_KEY` through `convex.config.ts`;
 - Convex loads both WorkOS JWT providers from `convex/auth.config.ts`;
 - `/callback` matches `WORKOS_REDIRECT_URI`;
 - `/` resolves to `src/routes/_public/index.tsx` without a duplicate-route error;
