@@ -17,10 +17,11 @@ Install the official Coss skill globally for the supported agents. Keep symlink 
 pnpm dlx skills add cosscom/coss --skill coss --global --agent opencode claude-code antigravity --yes
 ```
 
-From the shared UI package, install the complete Coss style:
+From the shared UI package, install the Coss style and all Coss components:
 
 ```powershell
 pnpm dlx shadcn@latest add @coss/style
+pnpm dlx shadcn@latest add @coss/ui
 ```
 
 ## Adapt Coss to TanStack Start
@@ -46,6 +47,14 @@ Do not create `layout.tsx`, use `next/font`, or retain Next.js-specific font wir
 4. Remove only the generated Next.js font wiring that the CSS setup replaces.
 
 Verify that TanStack's `src/routes/__root.tsx` already loads the shared stylesheet. Keep exactly one import and add it only when missing.
+
+In the existing shared `globals.css`, add `overscroll-contain` to the existing `body` rule without removing its other styles:
+
+```css
+body {
+  @apply overscroll-contain;
+}
+```
 
 In the root document, preserve existing classes and ensure the body and application wrapper have these classes:
 
