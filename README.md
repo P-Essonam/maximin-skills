@@ -1,6 +1,6 @@
 # Maximin Skills
 
-Private collection of reusable coding workflow skills.
+Public collection of reusable coding workflow skills.
 
 ## Available skills
 
@@ -8,13 +8,13 @@ Private collection of reusable coding workflow skills.
 
 ## Install with skills.sh
 
-Install `project-setup` globally for Codex:
+Install `project-setup` globally for OpenCode, Claude Code, and Antigravity:
 
 ```powershell
-npx skills add https://github.com/P-Essonam/maximin-skills --skill project-setup --global --agent codex
+npx skills add https://github.com/P-Essonam/maximin-skills --skill project-setup --global --agent opencode claude-code antigravity
 ```
 
-The GitHub account used by Git must have access to this private repository.
+The command intentionally omits `--copy`, so skills.sh links the installed skill into each agent's skill directory.
 
 Update installed global skills with:
 
