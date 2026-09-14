@@ -246,13 +246,13 @@ The `_auth` group is pathless, so the public callback remains `/callback` and mu
 
 ## Add the sign-in endpoint
 
-Create `src/routes/_auth/sign-in.tsx`. Keeping it directly under the pathless `_auth` group exposes it at `/sign-in`:
+Create `src/routes/_auth/sign-in/index.tsx`, matching the callback folder pattern. The pathless `_auth` group still exposes it at `/sign-in`:
 
 ```tsx
 import { createFileRoute } from "@tanstack/react-router"
 import { getSignInUrl } from "@workos/authkit-tanstack-react-start"
 
-export const Route = createFileRoute("/_auth/sign-in")({
+export const Route = createFileRoute("/_auth/sign-in/")({
   server: {
     handlers: {
       GET: async ({ request }: { request: Request }) => {
