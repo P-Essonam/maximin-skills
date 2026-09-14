@@ -1,0 +1,4 @@
+interface:
+  display_name: "Convex Setup"
+  short_description: "Connect Convex to TanStack Start"
+  default_prompt: "Use $convex-setup to add and connect Convex in this TanStack Start monorepo."

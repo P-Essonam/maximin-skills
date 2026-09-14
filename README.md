@@ -5,6 +5,7 @@ Public collection of reusable coding workflow skills.
 ## Available skills
 
 - `project-setup`: creates, validates, and privately publishes a shadcn TanStack Start monorepo with the agreed ESLint architecture boundaries.
+- `convex-setup`: creates a Convex backend package and connects it to the TanStack Start frontend.
 - `coss-ui-setup`: installs and configures Coss UI for the generated TanStack Start monorepo.
 
 ## Install with skills.sh
@@ -13,6 +14,12 @@ Install `project-setup` globally for OpenCode, Claude Code, and Antigravity:
 
 ```powershell
 npx skills add https://github.com/P-Essonam/maximin-skills --skill project-setup --global --agent opencode claude-code antigravity
+```
+
+Install `convex-setup` globally for the same agents:
+
+```powershell
+npx skills add https://github.com/P-Essonam/maximin-skills --skill convex-setup --global --agent opencode claude-code antigravity
 ```
 
 Install `coss-ui-setup` globally for the same agents:
