@@ -44,7 +44,7 @@ pnpm --filter @workspace/backend add convex@latest
 Run this command once during initial setup:
 
 ```powershell
-pnpm --filter @workspace/backend setup
+pnpm --filter @workspace/backend run setup
 ```
 
 Help the user log in. If they do not have an account, guide them through creating one. Use the repository folder name as the default Convex project name and the default US region unless the user specifies different values.
