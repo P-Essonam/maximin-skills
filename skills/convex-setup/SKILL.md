@@ -51,6 +51,20 @@ Help the user log in. If they do not have an account, guide them through creatin
 
 Let Convex create `packages/backend/.env.local` and `packages/backend/convex`. After setup succeeds, do not run `setup` again.
 
+## Declare Convex environment variables
+
+Create `packages/backend/convex/convex.config.ts` with an empty environment declaration. Do not add variables until the backend actually requires them:
+
+```ts
+import { defineApp } from "convex/server"
+
+const app = defineApp({
+  env: {},
+})
+
+export default app
+```
+
 If the Convex process is no longer running, start it from `packages/backend` and keep it running during development:
 
 ```powershell
@@ -148,6 +162,7 @@ Read `CONVEX_URL` from `packages/backend/.env.local` and write the same value as
 Confirm that:
 
 - the Convex development server is running;
+- `packages/backend/convex/convex.config.ts` declares `env: {}`;
 - `packages/backend/convex/_generated` exists;
 - the frontend resolves `@workspace/backend`;
 - the frontend has `VITE_CONVEX_URL`;
