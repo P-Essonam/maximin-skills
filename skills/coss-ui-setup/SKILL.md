@@ -61,4 +61,4 @@ In the root document, preserve existing classes and ensure the body and applicat
 
 ## Validate
 
-Run the existing lint, typecheck, and build commands. Open a portaled Coss component such as Dialog or Popover and verify that it appears above page content with a viewport-covering backdrop after scrolling. Remove any temporary validation UI, then report the commands run and files changed.
+Run the existing lint, typecheck, and build commands, then report the commands run and files changed.
