@@ -1,0 +1,4 @@
+interface:
+  display_name: "Coss UI Setup"
+  short_description: "Configure Coss UI for TanStack Start"
+  default_prompt: "Use $coss-ui-setup to configure Coss UI in this TanStack Start monorepo."
