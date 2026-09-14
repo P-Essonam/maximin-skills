@@ -1,0 +1,4 @@
+interface:
+  display_name: "WorkOS Auth Setup"
+  short_description: "Connect WorkOS AuthKit to Convex"
+  default_prompt: "Use $workos-auth-setup to add WorkOS AuthKit authentication to this TanStack Start monorepo."
