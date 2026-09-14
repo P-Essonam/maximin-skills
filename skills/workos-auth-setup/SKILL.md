@@ -244,7 +244,36 @@ export const Route = createFileRoute("/_auth/callback/")({
 
 The `_auth` group is pathless, so the public callback remains `/callback` and must match `WORKOS_REDIRECT_URI`.
 
-Do not create sign-in or sign-up route files.
+## Add the sign-in endpoint
+
+Create `src/routes/_auth/sign-in.tsx`. Keeping it directly under the pathless `_auth` group exposes it at `/sign-in`:
+
+```tsx
+import { createFileRoute } from "@tanstack/react-router"
+import { getSignInUrl } from "@workos/authkit-tanstack-react-start"
+
+export const Route = createFileRoute("/_auth/sign-in")({
+  server: {
+    handlers: {
+      GET: async ({ request }: { request: Request }) => {
+        const returnPathname = new URL(request.url).searchParams.get("returnPathname")
+        const url = await getSignInUrl(
+          returnPathname ? { data: { returnPathname } } : undefined,
+        )
+
+        return new Response(null, {
+          status: 307,
+          headers: { Location: url },
+        })
+      },
+    },
+  },
+})
+```
+
+On the [WorkOS dashboard Redirects page](https://dashboard.workos.com/redirects), set **Sign-in endpoint** to `http://localhost:3000/sign-in`. Use the detected frontend origin when its port differs. This endpoint is required for WorkOS-initiated flows such as impersonation because it starts the library's PKCE and CSRF flow.
+
+Do not create a sign-up route.
 
 ## Organize public and authenticated routes
 
@@ -256,11 +285,40 @@ export const Route = createFileRoute("/_public/")({
 
 Place marketing pages and all other public routes under `_public`.
 
+Update the existing public index component to show a sign-in button while signed out, then Dashboard and Log out buttons while signed in. Preserve the rest of the page:
+
+```tsx
+import { Link } from "@tanstack/react-router"
+import { useAuth } from "@workos/authkit-tanstack-react-start/client"
+import { Button } from "@workspace/ui/components/button"
+
+function HomePage() {
+  const { user, signOut } = useAuth()
+
+  return (
+    <div className="flex gap-2">
+      {user ? (
+        <>
+          <Button render={<Link to="/dashboard" />}>Dashboard</Button>
+          <Button variant="outline" onClick={() => void signOut()}>
+            Log out
+          </Button>
+        </>
+      ) : (
+        <Button render={<Link to="/sign-in" />}>Sign in</Button>
+      )}
+    </div>
+  )
+}
+```
+
+Adapt the component name and surrounding markup to the generated page instead of replacing its content.
+
 Create `src/routes/_authenticated/route.tsx` and place every private application route under `_authenticated`. Keep this file at the root of the route group: it is the pathless authenticated layout and does not create an `/app` URL segment.
 
 ```tsx
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router"
-import { getAuth, getSignInUrl } from "@workos/authkit-tanstack-react-start"
+import { getAuth } from "@workos/authkit-tanstack-react-start"
 import { Button } from "@workspace/ui/components/button"
 import { AuthLoading, Authenticated, Unauthenticated } from "convex/react"
 import { Loader } from "lucide-react"
@@ -269,11 +327,12 @@ export const Route = createFileRoute("/_authenticated")({
   component: RouteComponent,
   loader: async () => {
     const { user } = await getAuth()
-    const signInUrl = await getSignInUrl()
 
     if (!user) {
-      throw redirect({ href: signInUrl })
+      throw redirect({ href: "/sign-in" })
     }
+
+    return { user }
   },
 })
 
@@ -325,15 +384,14 @@ Create `src/server/middlewares.ts`:
 ```ts
 import { redirect } from "@tanstack/react-router"
 import { createMiddleware } from "@tanstack/react-start"
-import { getAuth, getSignInUrl } from "@workos/authkit-tanstack-react-start"
+import { getAuth } from "@workos/authkit-tanstack-react-start"
 
 export const authMiddleware = createMiddleware({ type: "function" }).server(
   async ({ next }) => {
     const { user } = await getAuth()
 
     if (!user) {
-      const signInUrl = await getSignInUrl()
-      throw redirect({ href: signInUrl })
+      throw redirect({ href: "/sign-in" })
     }
 
     return next({ context: { user } })
@@ -349,7 +407,9 @@ Regenerate the TanStack route tree, then confirm that:
 
 - AuthKit and CSRF request middleware are active;
 - `/callback` matches `WORKOS_REDIRECT_URI`;
+- `/sign-in` starts AuthKit and matches the WorkOS dashboard Sign-in endpoint;
 - `/` resolves to `src/routes/_public/index.tsx` without a duplicate-route error;
+- the public index shows the correct authentication buttons;
 - `/dashboard` resolves beneath the authenticated layout and redirects signed-out users to WorkOS;
 - authenticated Convex SSR receives the access token;
 - `authMiddleware` exposes `context.user`;
