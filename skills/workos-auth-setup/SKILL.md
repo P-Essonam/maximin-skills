@@ -256,7 +256,7 @@ export const Route = createFileRoute("/_public/")({
 
 Place marketing pages and all other public routes under `_public`.
 
-Create `src/routes/_authenticated/route.tsx` and place every private application route under `_authenticated`:
+Create `src/routes/_authenticated/route.tsx` and place every private application route under `_authenticated`. Keep this file at the root of the route group: it is the pathless authenticated layout and does not create an `/app` URL segment.
 
 ```tsx
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router"
@@ -300,6 +300,24 @@ function RouteComponent() {
 }
 ```
 
+Do not create `src/routes/_authenticated/index.tsx`: it would resolve to `/` and conflict with the public index route.
+
+Create the first private page at `src/routes/_authenticated/dashboard/index.tsx`:
+
+```tsx
+import { createFileRoute } from "@tanstack/react-router"
+
+export const Route = createFileRoute("/_authenticated/dashboard/")({
+  component: DashboardPage,
+})
+
+function DashboardPage() {
+  return <h1>Dashboard</h1>
+}
+```
+
+This gives the authenticated layout a concrete `/dashboard` child while `src/routes/_public/index.tsx` remains the only route for `/`.
+
 ## Add server-function auth middleware
 
 Create `src/server/middlewares.ts`:
@@ -331,8 +349,8 @@ Regenerate the TanStack route tree, then confirm that:
 
 - AuthKit and CSRF request middleware are active;
 - `/callback` matches `WORKOS_REDIRECT_URI`;
-- public routes load while signed out;
-- private routes redirect signed-out users to WorkOS;
+- `/` resolves to `src/routes/_public/index.tsx` without a duplicate-route error;
+- `/dashboard` resolves beneath the authenticated layout and redirects signed-out users to WorkOS;
 - authenticated Convex SSR receives the access token;
 - `authMiddleware` exposes `context.user`;
 - custom error and not-found components render; and
