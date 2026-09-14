@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Setup"
+  short_description: "Create a validated TanStack monorepo"
+  default_prompt: "Use $project-setup to create a new TanStack monorepo project."
