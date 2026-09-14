@@ -22,7 +22,7 @@ Ask only for the project name. Resolve the operating system's Music folder and u
 
 ## Add architecture boundaries
 
-Locate the generated TanStack Start application. Install `eslint-plugin-boundaries` in that workspace and integrate [assets/eslint-boundaries.config.js](assets/eslint-boundaries.config.js) with its existing ESLint flat config. Preserve the generated ESLint configuration and append the exported configurations.
+Locate the generated TanStack Start application. Install `eslint-plugin-boundaries` in that workspace and integrate the bundled [ESLint boundaries configuration](assets/eslint-boundaries.config.js) with its existing ESLint flat config. Read it from the installed skill; do not fetch a remote copy. Preserve the generated ESLint configuration and append the exported configurations.
 
 Keep feature code under folders inside `src/features/<feature-name>/`, typically `components`, `hooks`, and `lib`. Put feature-specific types, utilities, schemas, and constants in that feature's `lib` folder. Do not require barrel or index files.
 
