@@ -236,13 +236,13 @@ import { handleCallbackRoute } from "@workos/authkit-tanstack-react-start"
 export const Route = createFileRoute("/_auth/callback/")({
   server: {
     handlers: {
-      GET: handleCallbackRoute({ errorRedirectUrl: "/" }),
+      GET: handleCallbackRoute({ errorRedirectUrl: "/sign-in" }),
     },
   },
 })
 ```
 
-The `_auth` group is pathless, so the public callback remains `/callback` and must match `WORKOS_REDIRECT_URI`.
+The `_auth` group is pathless, so the public callback remains `/callback` and must match `WORKOS_REDIRECT_URI`. Callback errors return to `/sign-in` so the user can restart authentication.
 
 ## Add the sign-in endpoint
 
