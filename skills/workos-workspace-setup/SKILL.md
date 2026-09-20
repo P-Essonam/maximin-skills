@@ -77,7 +77,7 @@ Create `apps/<frontend-app>/src/routes/_authenticated/new-workspace/index.tsx` w
 
 Keep onboarding inside `_authenticated`, so only signed-in users can reach it. Use `useAuth({ ensureSignedIn: true })` in the route component, following the Clics pattern.
 
-Do not wrap the onboarding page with `WorkspaceGuard`; users without a workspace must be able to create one.
+Do not import or render `WorkspaceGuard` in the onboarding route or its form component; users without a workspace must be able to create one. The guard belongs only in the authenticated dashboard route below.
 
 Match the Clics onboarding layout positioning without copying its product-specific content. The route component must use:
 
@@ -162,7 +162,7 @@ function DashboardPage() {
 }
 ```
 
-Do not put `WorkspaceGuard` around the `_authenticated` layout itself, add a `_workspace` route group, or change the authenticated route layout; `/new-workspace` must remain reachable for signed-in users without an organization.
+Do not put `WorkspaceGuard` around the `_authenticated` layout itself, add a `_workspace` route group, or change the authenticated route layout; `/new-workspace` must remain reachable for signed-in users without an organization. The dashboard route is the only place this skill renders `WorkspaceGuard`.
 
 ## Add the workspace switcher
 
