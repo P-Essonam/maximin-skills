@@ -73,11 +73,11 @@ It must:
 
 ## Add the onboarding route
 
-Create `apps/<frontend-app>/src/routes/_authenticated/new-workspace/index.tsx` with route ID `/_authenticated/new-workspace/`.
+Create `apps/<frontend-app>/src/routes/_auth/new-workspace/index.tsx` with route ID `/_auth/new-workspace/`.
 
-Keep onboarding inside `_authenticated`, so only signed-in users can reach it. Use `useAuth({ ensureSignedIn: true })` in the route component, following the Clics pattern.
+Keep onboarding inside the pathless `_auth` route group, alongside the callback route. Use `useAuth({ ensureSignedIn: true })` in the route component, following the Clics pattern. Do not put this route under `_authenticated`: users without an active organization must be able to reach it after the authenticated layout redirects them from a protected route.
 
-Do not import or render `WorkspaceGuard` in the onboarding route or its form component; users without a workspace must be able to create one. The guard belongs only in the authenticated dashboard route below.
+Do not import or render `WorkspaceGuard` in the onboarding route or its form component; users without a workspace must be able to create one. The guard is applied by the authenticated layout below, not by this route.
 
 Match the Clics onboarding layout positioning without copying its product-specific content. The route component must use:
 
@@ -137,9 +137,19 @@ The guard must call `useAuth({ ensureSignedIn: true })`, read `organizationId`, 
 
 when no organization is active. Otherwise render its children.
 
-Keep the existing auth guard in `src/routes/_authenticated/route.tsx`. Add the workspace guard in the dashboard route, after that parent auth guard has established that the user is signed in. In `apps/<frontend-app>/src/routes/_authenticated/dashboard/index.tsx`, render the dashboard content inside `WorkspaceGuard` and place `WorkspaceSwitcher` in the dashboard header.
+Keep the existing auth guard in `src/routes/_authenticated/route.tsx`. Import `WorkspaceGuard` there and wrap the authenticated outlet directly inside `<Authenticated>`:
 
-Do not put `WorkspaceGuard` around the `_authenticated` layout itself, add a `_workspace` route group, or change the authenticated route layout; `/new-workspace` must remain reachable for signed-in users without an organization. The dashboard route is the only place this skill renders `WorkspaceGuard`.
+```tsx
+<Authenticated>
+  <WorkspaceGuard>
+    <Outlet />
+  </WorkspaceGuard>
+</Authenticated>
+```
+
+This makes the authenticated layout redirect signed-in users without an active organization to `/new-workspace`, while the `_auth/new-workspace` route remains reachable because it is outside `_authenticated`. In `apps/<frontend-app>/src/routes/_authenticated/dashboard/index.tsx`, render the dashboard content normally and place `WorkspaceSwitcher` in the dashboard header.
+
+Do not put `WorkspaceGuard` around the `_auth/new-workspace` route, add a `_workspace` route group, or add a second dashboard-only guard. The authenticated layout is the single place this skill renders `WorkspaceGuard`, nested under `<Authenticated>` and directly around `<Outlet />`.
 
 ## Add the workspace switcher
 
@@ -163,10 +173,10 @@ Use this helper in every organization-scoped Convex query and mutation. Never us
 
 Regenerate the TanStack route tree and confirm that:
 
-- signed-in users without an organization reach `/new-workspace`;
+- signed-in users without an organization are redirected from protected routes to `/new-workspace` by the authenticated layout;
 - onboarding creates a WorkOS organization and admin membership;
 - switching refreshes the session before `/dashboard` loads;
-- the dashboard route applies `WorkspaceGuard` after the parent auth guard and renders `WorkspaceSwitcher`;
+- the authenticated layout renders `WorkspaceGuard` under `<Authenticated>` around `<Outlet />`, and the dashboard renders `WorkspaceSwitcher`;
 - the workspace switcher lists and switches memberships;
 - Convex rejects calls without `org_id`;
 - organization-scoped data uses `requireOrganization(ctx)`;
