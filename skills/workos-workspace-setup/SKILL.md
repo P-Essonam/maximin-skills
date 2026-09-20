@@ -137,30 +137,7 @@ The guard must call `useAuth({ ensureSignedIn: true })`, read `organizationId`, 
 
 when no organization is active. Otherwise render its children.
 
-Keep the existing auth guard in `src/routes/_authenticated/route.tsx`. Add the workspace guard in the dashboard route, after that parent auth guard has established that the user is signed in. Update `apps/<frontend-app>/src/routes/_authenticated/dashboard/index.tsx` to replace the placeholder page with:
-
-```tsx
-import { createFileRoute } from "@tanstack/react-router"
-import WorkspaceGuard from "@/features/auth/components/workspace-guard"
-import WorkspaceSwitcher from "@/components/workspace-switcher"
-
-export const Route = createFileRoute("/_authenticated/dashboard/")({
-  component: DashboardPage,
-})
-
-function DashboardPage() {
-  return (
-    <WorkspaceGuard>
-      <main className="flex min-h-svh flex-col gap-6 p-6">
-        <header className="flex items-center justify-between gap-4">
-          <h1 className="text-2xl font-medium">Dashboard</h1>
-          <WorkspaceSwitcher />
-        </header>
-      </main>
-    </WorkspaceGuard>
-  )
-}
-```
+Keep the existing auth guard in `src/routes/_authenticated/route.tsx`. Add the workspace guard in the dashboard route, after that parent auth guard has established that the user is signed in. In `apps/<frontend-app>/src/routes/_authenticated/dashboard/index.tsx`, render the dashboard content inside `WorkspaceGuard` and place `WorkspaceSwitcher` in the dashboard header.
 
 Do not put `WorkspaceGuard` around the `_authenticated` layout itself, add a `_workspace` route group, or change the authenticated route layout; `/new-workspace` must remain reachable for signed-in users without an organization. The dashboard route is the only place this skill renders `WorkspaceGuard`.
 
