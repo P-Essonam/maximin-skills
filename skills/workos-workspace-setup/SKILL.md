@@ -79,6 +79,17 @@ Keep onboarding inside `_authenticated`, so only signed-in users can reach it. U
 
 Do not wrap the onboarding page with `WorkspaceGuard`; users without a workspace must be able to create one.
 
+Match the Clics onboarding layout positioning without copying its product-specific content. The route component must use:
+
+- an outer `grid min-h-dvh grid-rows-[auto_1fr] overflow-hidden p-6` container;
+- a header with `flex items-start justify-between gap-4`;
+- the brand or app link on the left;
+- a right-aligned `flex flex-col items-end gap-3` block containing the signed-in user text and the sign-out action;
+- a main area with `flex flex-col items-center justify-center` so the workspace form stays centered in the remaining viewport;
+- a form container with `flex w-full max-w-sm flex-col gap-6`.
+
+Keep the header positioning and spacing consistent at mobile and desktop widths. Do not use absolute positioning for these layout items.
+
 Create `apps/<frontend-app>/src/features/auth/lib/workspace-schema.ts` with the Zod schema and inferred form type:
 
 ```ts
