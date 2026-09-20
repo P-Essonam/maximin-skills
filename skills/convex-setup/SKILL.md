@@ -5,6 +5,8 @@ description: Add a Convex backend package and connect it to the TanStack Start f
 
 # Convex Setup
 
+Follow this skill strictly.
+
 ## Verify the project
 
 Confirm the monorepo was created with `$project-setup`. If it was not, stop and ask the user to run that skill first.

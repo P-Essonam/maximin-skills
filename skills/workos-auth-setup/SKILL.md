@@ -5,6 +5,8 @@ description: Add WorkOS AuthKit authentication to an existing TanStack Start mon
 
 # WorkOS Auth Setup
 
+Follow this skill strictly.
+
 Reference: [Convex AuthKit add-to-app guide](https://docs.convex.dev/auth/authkit/add-to-app).
 
 ## Verify the project

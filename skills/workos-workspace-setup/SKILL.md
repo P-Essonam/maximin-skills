@@ -5,6 +5,8 @@ description: Add WorkOS organization-backed workspace onboarding, switching, and
 
 # WorkOS Workspace Setup
 
+Follow this skill strictly.
+
 Use WorkOS Organizations as application workspaces. WorkOS remains the source of truth for organizations and memberships; Convex scopes application data with the active `org_id` claim.
 
 ## Verify the project

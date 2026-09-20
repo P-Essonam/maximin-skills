@@ -5,6 +5,8 @@ description: Create a new shadcn TanStack Start monorepo in the user's Music fol
 
 # Project Setup
 
+Follow this skill strictly.
+
 Ask only for the project name. Resolve the operating system's Music folder and use `<Music>/<project-name>` as the destination.
 
 ## Create the project
