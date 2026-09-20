@@ -321,7 +321,7 @@ import { Button } from "@workspace/ui/components/button"
 export const Route = createFileRoute("/_public/")({ component: App })
 
 function App() {
-  const { user, signIn, signOut } = useAuth()
+  const { user, signOut } = useAuth()
 
   return (
     <div className="flex min-h-svh p-6">
@@ -342,7 +342,9 @@ function App() {
               </Button>
             </>
           ) : (
-            <Button onClick={() => void signIn()}>Sign in</Button>
+            <Button onClick={() => window.location.assign("/dashboard")}>
+              Sign in
+            </Button>
           )}
         </div>
       </div>
@@ -351,7 +353,7 @@ function App() {
 }
 ```
 
-If an unauthenticated user needs to be sent through the sign-in flow, navigate to `/dashboard`. The authenticated layout redirects signed-out users to WorkOS and preserves `/dashboard` as the return path. Do not add a separate sign-in endpoint for this flow.
+The signed-out sign-in button must navigate to `/dashboard`. The authenticated layout redirects signed-out users to WorkOS and preserves `/dashboard` as the return path. Do not call `signIn()`, call `getSignInUrl()` from the public page, or add a separate sign-in endpoint for this flow.
 
 Create `src/routes/_authenticated/route.tsx` and place every private application route under `_authenticated`. Keep this file at the root of the route group: it is the pathless authenticated layout and does not create an `/app` URL segment.
 
