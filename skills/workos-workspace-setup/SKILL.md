@@ -126,7 +126,32 @@ The guard must call `useAuth({ ensureSignedIn: true })`, read `organizationId`, 
 
 when no organization is active. Otherwise render its children.
 
-Wrap the existing dashboard content with this guard in `src/routes/_authenticated/dashboard/index.tsx`. Do not add a `_workspace` route group or change the existing authenticated route layout.
+Keep the existing auth guard in `src/routes/_authenticated/route.tsx`. Add the workspace guard in the dashboard route, after that parent auth guard has established that the user is signed in. Update `apps/<frontend-app>/src/routes/_authenticated/dashboard/index.tsx` to replace the placeholder page with:
+
+```tsx
+import { createFileRoute } from "@tanstack/react-router"
+import WorkspaceGuard from "@/features/auth/components/workspace-guard"
+import WorkspaceSwitcher from "@/components/workspace-switcher"
+
+export const Route = createFileRoute("/_authenticated/dashboard/")({
+  component: DashboardPage,
+})
+
+function DashboardPage() {
+  return (
+    <WorkspaceGuard>
+      <main className="flex min-h-svh flex-col gap-6 p-6">
+        <header className="flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-medium">Dashboard</h1>
+          <WorkspaceSwitcher />
+        </header>
+      </main>
+    </WorkspaceGuard>
+  )
+}
+```
+
+Do not put `WorkspaceGuard` around the `_authenticated` layout itself, add a `_workspace` route group, or change the authenticated route layout; `/new-workspace` must remain reachable for signed-in users without an organization.
 
 ## Add the workspace switcher
 
@@ -153,7 +178,7 @@ Regenerate the TanStack route tree and confirm that:
 - signed-in users without an organization reach `/new-workspace`;
 - onboarding creates a WorkOS organization and admin membership;
 - switching refreshes the session before `/dashboard` loads;
-- the dashboard is wrapped by `WorkspaceGuard`;
+- the dashboard route applies `WorkspaceGuard` after the parent auth guard and renders `WorkspaceSwitcher`;
 - the workspace switcher lists and switches memberships;
 - Convex rejects calls without `org_id`;
 - organization-scoped data uses `requireOrganization(ctx)`;
