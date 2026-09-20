@@ -1,0 +1,4 @@
+interface:
+  display_name: "WorkOS Workspace Setup"
+  short_description: "Add WorkOS workspace onboarding"
+  default_prompt: "Use $workos-workspace-setup to add WorkOS workspace onboarding and organization protection to this TanStack Start monorepo."

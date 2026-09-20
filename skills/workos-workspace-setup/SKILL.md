@@ -1,0 +1,129 @@
+---
+name: workos-workspace-setup
+description: Add WorkOS organization-backed workspace onboarding, switching, and Convex workspace guards to an existing TanStack Start monorepo using Coss UI. Use after workos-auth-setup when users need workspace creation or switching, not invitations, billing, or RBAC.
+---
+
+# WorkOS Workspace Setup
+
+Use WorkOS Organizations as application workspaces. WorkOS remains the source of truth for organizations and memberships; Convex scopes application data with the active `org_id` claim.
+
+## Verify the project
+
+Require `$project-setup`, `$convex-setup`, `$coss-ui-setup`, and `$workos-auth-setup`. If one is missing, stop and ask the user to run it first.
+
+Find the TanStack Start frontend under `apps/*` and read its package name from that workspace's `package.json`. Use the detected package name in every pnpm filter and path below.
+
+Do not add invitations, member-management screens, billing, subscriptions, or RBAC in this skill.
+
+## Install the WorkOS server SDK
+
+Install the SDK in the detected frontend workspace:
+
+```powershell
+pnpm --filter <frontend-package-name> add @workos-inc/node
+```
+
+## Keep WorkOS credentials server-only
+
+Create or update `apps/<frontend-app>/src/server/apis.ts`:
+
+```ts
+import { createServerOnlyFn } from "@tanstack/react-start"
+
+export const workosApiKey = createServerOnlyFn(
+  () => process.env.WORKOS_API_KEY,
+)
+```
+
+Read the API key only through `workosApiKey()` from server functions. Do not read `process.env.WORKOS_API_KEY` in route components, hooks, or other client-importable files. Preserve existing accessors in `apis.ts`.
+
+## Add organization server functions
+
+Create `apps/<frontend-app>/src/server/organizations.ts`.
+
+Use the existing `authMiddleware`, `workspaceMiddleware`, `zod`, `@workos-inc/node`, and `switchToOrganization` imports. Construct the WorkOS client with `workosApiKey()`.
+
+Implement only these functions:
+
+- `createWorkspace`: require the signed-in user, validate the workspace name, create a WorkOS organization, add the user as an `admin` member, and return `organizationId`;
+- `listWorkspaces`: list the signed-in user's WorkOS organization memberships;
+- `switchWorkspace`: validate the target ID and call `switchToOrganization`;
+- `getWorkspace`: read the active organization through `workspaceMiddleware`.
+
+Do not accept a client-supplied organization ID as proof of access. WorkOS membership and the active session determine access.
+
+## Add workspace middleware
+
+Extend the existing frontend `src/server/middlewares.ts` with `workspaceMiddleware`.
+
+It must:
+
+- require an authenticated user;
+- use the existing sign-in redirect when no user exists;
+- redirect to `/new-workspace` when `organizationId` is missing;
+- expose `user`, `organizationId`, `role`, and `permissions` in the server-function context.
+
+## Add the onboarding route
+
+Create `apps/<frontend-app>/src/routes/_authenticated/new-workspace/index.tsx` with route ID `/_authenticated/new-workspace/`.
+
+Keep onboarding inside `_authenticated`, so only signed-in users can reach it. Use `useAuth({ ensureSignedIn: true })` in the route component, following the Clics pattern.
+
+Do not wrap the onboarding page with `WorkspaceGuard`; users without a workspace must be able to create one.
+
+Build the form with Coss components. Its submit flow is:
+
+```text
+createWorkspace
+→ switchWorkspace
+→ window.location.assign("/dashboard")
+```
+
+The full navigation reloads AuthKit and Convex with the new organization's session claims.
+
+## Add the workspace guard
+
+Create `apps/<frontend-app>/src/features/auth/components/workspace-guard.tsx`.
+
+The guard must call `useAuth({ ensureSignedIn: true })`, read `organizationId`, and render:
+
+```tsx
+<Navigate to="/new-workspace" replace />
+```
+
+when no organization is active. Otherwise render its children.
+
+Wrap the existing dashboard content with this guard in `src/routes/_authenticated/dashboard/index.tsx`. Do not add a `_workspace` route group or change the existing authenticated route layout.
+
+## Add the workspace switcher
+
+Create `apps/<frontend-app>/src/components/workspace-switcher.tsx` following the Clics implementation:
+
+- use `useAuth({ ensureSignedIn: true })`;
+- load memberships through `listWorkspaces` with `useInfiniteQuery`;
+- use Coss `Popover`, `PopoverTrigger`, `PopoverContent`, and `Button`;
+- call `switchWorkspace` when a workspace is selected;
+- call `window.location.reload()` after switching.
+
+## Add reusable Convex authorization
+
+Extend or create `packages/backend/convex/utils.ts` with `requireOrganization(ctx)`.
+
+The helper must call `ctx.auth.getUserIdentity()`, reject a missing identity, read `identity.org_id`, reject a missing organization, and return the identity with `organizationId`.
+
+Use this helper in every organization-scoped Convex query and mutation. Never use a client-provided organization ID to authorize access. Do not create an organizations or memberships table unless the application needs additional organization metadata.
+
+## Validate
+
+Regenerate the TanStack route tree and confirm that:
+
+- signed-in users without an organization reach `/new-workspace`;
+- onboarding creates a WorkOS organization and admin membership;
+- switching refreshes the session before `/dashboard` loads;
+- the dashboard is wrapped by `WorkspaceGuard`;
+- the workspace switcher lists and switches memberships;
+- Convex rejects calls without `org_id`;
+- organization-scoped data uses `requireOrganization(ctx)`;
+- frontend lint, typecheck, and build plus backend typecheck pass.
+
+Report changed files and commands without exposing environment values.
