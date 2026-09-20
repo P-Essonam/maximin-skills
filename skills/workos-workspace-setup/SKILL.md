@@ -1,6 +1,6 @@
 ---
 name: workos-workspace-setup
-description: Add WorkOS organization-backed workspace onboarding, switching, and Convex workspace guards to an existing TanStack Start monorepo using Coss UI. Use after workos-auth-setup when users need workspace creation or switching, not invitations, billing, or RBAC.
+description: Add WorkOS organization-backed workspace onboarding, switching, and Convex workspace guards to an existing TanStack Start monorepo using Coss UI. Use after workos-auth-setup when users need workspace creation or switching.
 ---
 
 # WorkOS Workspace Setup
@@ -12,8 +12,6 @@ Use WorkOS Organizations as application workspaces. WorkOS remains the source of
 Require `$project-setup`, `$convex-setup`, `$coss-ui-setup`, and `$workos-auth-setup`. If one is missing, stop and ask the user to run it first.
 
 Find the TanStack Start frontend under `apps/*` and read its package name from that workspace's `package.json`. Use the detected package name in every pnpm filter and path below.
-
-Do not add invitations, member-management screens, billing, subscriptions, or RBAC in this skill.
 
 ## Install the WorkOS server SDK
 
