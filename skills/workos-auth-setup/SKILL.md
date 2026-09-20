@@ -309,34 +309,47 @@ export const Route = createFileRoute("/_public/")({
 
 Place marketing pages and all other public routes under `_public`.
 
-Update the existing public index component to show a sign-in button while signed out, then Dashboard and Log out buttons while signed in. Preserve the rest of the page:
+Update the existing public index component to show a sign-in button while signed out, then Dashboard and Log out buttons while signed in. Preserve the rest of the page and use this route/component shape:
 
 ```tsx
-import { Link } from "@tanstack/react-router"
+import { Link, createFileRoute } from "@tanstack/react-router"
 import { useAuth } from "@workos/authkit-tanstack-react-start/client"
 import { Button } from "@workspace/ui/components/button"
 
-function HomePage() {
+export const Route = createFileRoute("/_public/")({ component: App })
+
+function App() {
   const { user, signIn, signOut } = useAuth()
 
   return (
-    <div className="flex gap-2">
-      {user ? (
-        <>
-          <Button render={<Link to="/dashboard" />}>Dashboard</Button>
-          <Button variant="outline" onClick={() => void signOut()}>
-            Log out
-          </Button>
-        </>
-      ) : (
-        <Button onClick={() => void signIn()}>Sign in</Button>
-      )}
+    <div className="flex min-h-svh p-6">
+      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
+        <div>
+          <h1 className="font-medium">Project ready!</h1>
+          <p>You may now add components and start building.</p>
+          <p>We&apos;ve already added the button component for you.</p>
+          <Button className="mt-2">Button</Button>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {user ? (
+            <>
+              <Button render={<Link to="/dashboard" />}>Dashboard</Button>
+              <Button onClick={() => void signOut()} variant="outline">
+                Log out
+              </Button>
+            </>
+          ) : (
+            <Button onClick={() => void signIn()}>Sign in</Button>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
 ```
 
-Adapt the component name and surrounding markup to the generated page instead of replacing its content.
+If an unauthenticated user needs to be sent through the sign-in flow, navigate to `/dashboard`. The authenticated layout redirects signed-out users to WorkOS and preserves `/dashboard` as the return path. Do not add a separate sign-in endpoint for this flow.
 
 Create `src/routes/_authenticated/route.tsx` and place every private application route under `_authenticated`. Keep this file at the root of the route group: it is the pathless authenticated layout and does not create an `/app` URL segment.
 
