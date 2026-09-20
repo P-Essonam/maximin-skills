@@ -23,6 +23,14 @@ Install the SDK in the detected frontend workspace:
 pnpm --filter <frontend-package-name> add @workos-inc/node
 ```
 
+## Install form dependencies
+
+Install the form libraries in the detected frontend workspace:
+
+```powershell
+pnpm --filter <frontend-package-name> add @hookform/resolvers react-hook-form zod
+```
+
 ## Keep WorkOS credentials server-only
 
 Create or update `apps/<frontend-app>/src/server/apis.ts`:
@@ -71,7 +79,32 @@ Keep onboarding inside `_authenticated`, so only signed-in users can reach it. U
 
 Do not wrap the onboarding page with `WorkspaceGuard`; users without a workspace must be able to create one.
 
-Build the form with Coss components. Its submit flow is:
+Create `apps/<frontend-app>/src/features/auth/lib/workspace-schema.ts` with the Zod schema and inferred form type:
+
+```ts
+import { z } from "zod"
+
+export const workspaceSchema = z.object({
+  workspaceName: z
+    .string()
+    .trim()
+    .min(2, "Workspace name must be at least 2 characters"),
+})
+
+export type WorkspaceFormData = z.infer<typeof workspaceSchema>
+```
+
+Build the form with React Hook Form and Coss components, following the Clics pattern:
+
+- import `Controller` and `useForm` from `react-hook-form`;
+- pass `zodResolver(workspaceSchema)` to `useForm<WorkspaceFormData>`;
+- set `defaultValues` for every field and use `mode: "onSubmit"`;
+- render controlled fields with Coss `Field`, `FieldLabel`, `Input`, and `FieldError` components;
+- submit with `form.handleSubmit`, disable fields while `form.formState.isSubmitting`, and show the submit loading state;
+- trim the workspace name before sending it to the server function;
+- keep Clics-specific project creation, domain fields, tracking, and multi-step screens out of this route.
+
+Its submit flow is:
 
 ```text
 createWorkspace
