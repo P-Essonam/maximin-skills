@@ -342,9 +342,7 @@ function App() {
               </Button>
             </>
           ) : (
-            <Button onClick={() => window.location.assign("/dashboard")}>
-              Sign in
-            </Button>
+            <Button render={<Link to="/dashboard" />}>Sign in</Button>
           )}
         </div>
       </div>
@@ -353,7 +351,7 @@ function App() {
 }
 ```
 
-The signed-out sign-in button must navigate to `/dashboard`. The authenticated layout redirects signed-out users to WorkOS and preserves `/dashboard` as the return path. Do not call `signIn()`, call `getSignInUrl()` from the public page, or add a separate sign-in endpoint for this flow.
+The signed-out sign-in button must use the TanStack Router link pattern `<Button render={<Link to="/dashboard" />}>Sign in</Button>`. The authenticated layout redirects signed-out users to WorkOS and preserves `/dashboard` as the return path. Do not call `signIn()`, call `getSignInUrl()` from the public page, use `window.location.assign()` for this button, or add a separate sign-in endpoint for this flow.
 
 Create `src/routes/_authenticated/route.tsx` and place every private application route under `_authenticated`. Keep this file at the root of the route group: it is the pathless authenticated layout and does not create an `/app` URL segment.
 
