@@ -35,6 +35,8 @@ VITE_CONVEX_URL=https://your-convex-url.convex.cloud
 
 Use the detected frontend port instead of `3000` when it differs. Configure the same callback URL in WorkOS. Keep `WORKOS_API_KEY` server-only, require at least 32 characters for `WORKOS_COOKIE_PASSWORD`, never commit `.env.local`, and never print environment values.
 
+Do not require or prompt the user to configure a WorkOS Initiate Login URI. It is optional for this skill's core setup and must not block completion.
+
 Configure the same WorkOS credentials in Convex. From the backend package directory, set both Convex environment variables:
 
 ```bash
